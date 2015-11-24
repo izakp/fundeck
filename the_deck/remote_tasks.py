@@ -1,7 +1,17 @@
 from fabric.api import task, run, sudo, parallel
 
-# http://docs.fabfile.org/en/1.10/api/core/operations.html#fabric.operations.run
+"""
+TODO
 
+Look into fabric/operations.py._execute for paramiko implementation
+
+Thread Pool for stdin,stdout,stderr - pipe via Redis  LPUSH/RPOP?
+
+http://docs.fabfile.org/en/1.10/api/core/operations.html#fabric.operations.run
+
+No parallel operations (no forking within multiprocessign if possible)
+
+"""
 @task
 def run_command_sync(command):
     return run(command)

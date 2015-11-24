@@ -15,6 +15,8 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
+CELERY_RESULT_BACKEND = 'db+sqlite:///task_results.sqlite'
+
 """
 Django settings for fundeck project.
 
@@ -56,7 +58,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'kombu.transport.django',
     'bootstrap3',
-    'deck',
+    'the_deck',
 )
 
 MIDDLEWARE_CLASSES = (

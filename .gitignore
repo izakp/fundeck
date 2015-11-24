@@ -4,7 +4,8 @@
 
 *.png
 localsettings.py
-the_database/media
+the_deck/media
 
 *.sql
+*.sqlite
 *.tar
