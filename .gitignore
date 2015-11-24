@@ -1,0 +1,10 @@
+*.pyc
+*.pyo
+*.sqlite3
+
+*.png
+localsettings.py
+the_database/media
+
+*.sql
+*.tar
