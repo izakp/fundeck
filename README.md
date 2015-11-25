@@ -43,18 +43,27 @@ Todo:
 
 A clone of Rundeck that emphasizes fun over agony
 
+Setup:
+
+Fact!  Fundeck recommends using Virtual Environments: http://docs.python-guide.org/en/latest/dev/virtualenvs/
+
 `mkvirtualenv fundeck`
 
 `pip install -r requirements.txt`
 
 `python ./manage.py syncdb`
 
+
+Development:
+
 `python ./manage.py runserver`
 
-`PYTHONOPTIMIZE=1 celery -A fundeck worker -l info`
+`celery -A fundeck worker -l info`
 
-Caveat: https://github.com/celery/celery/issues/1709
+Production:
 
-"AssertionError: daemonic processes are not allowed to have children"
+`gunicorn fundeck.wsgi -w 4 --bind=0.0.0.0:80` (Starts 4 workers binding to all interfaces on port 80)
 
-`export PYTHONOPTIMIZE=1` (Skips assertions at Runtime)
+`celery -A fundeck worker --autoscale=40,4`  (Autoscales between 4 and 40 task workers)
+
+Also Fact!  Fundeck endorses Supervisord (http://supervisord.org/) to manage production services.
