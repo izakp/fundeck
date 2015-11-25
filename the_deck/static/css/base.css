@@ -1,0 +1,419 @@
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #000;
+  background-color: #f1f1f1;
+}
+
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  /*font-size: 18pt/24px;*/
+  margin-top: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: normal;
+}
+
+.container {
+  width: 1025px;
+}
+
+.btn {
+  border-radius: 0px;
+}
+
+.inline-link {
+  text-decoration: underline;
+}
+
+.hoverblue {
+  color: #0080FF;
+}
+
+#navbar {
+  background-color: #FFF;
+  width: 100%;
+}
+
+.navbar {
+  margin-bottom: 0;
+}
+
+#home {
+  margin-left: 20px;
+}
+
+#home a,
+#survey-success a {
+  margin: 10px 0 10px 0;
+  display: inline-block;
+}
+
+#content {
+  padding: 0;
+}
+
+div.container div.row h1 {
+  font-size:18px;
+}
+
+#survey form div.row {
+  background-color: #fff;
+  margin: 10px 0 10px 0;
+  padding: 15px;
+}
+
+#survey form div#contact-data {
+  padding-top: 30px;
+}
+
+#survey form div.row div.col-sm-6 h4 {
+  margin: 0 15px 15px 5px;
+}
+
+div#permissions h4 {
+  margin: 15px 15px 15px 20px;
+}
+
+#permissions .form-group {
+  margin: 10px 5px 10px 5px;
+}
+
+#survey form div.row h5 {
+  margin: 20px;
+}
+
+#survey form div.row div.col-sm-3 h5 {
+  margin: 20px 0 20px 5px;
+  font-weight: bold;
+}
+
+.form-horizontal .form-group {
+  margin: 5px;
+}
+
+.btn-file {
+  overflow: hidden;
+}
+
+#scan-filename {
+  margin: 25px 0 10px 0;
+}
+
+#scan-select {
+  position: relative;
+  height: 35px;
+  width: 120px;
+}
+
+#survey input[type=file] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+#survey #no-scan {
+  display: block;
+  margin-top: 30px;
+}
+
+input[type=checkbox] {
+  display:none;
+}
+ 
+input[type=checkbox] + label {
+   background: #CCC;
+   height: 20px;
+   width: 20px;
+   display:inline-block;
+   font-weight: normal;
+   text-align: center;
+   margin-bottom: -5px;
+}
+
+input[type=checkbox]:checked + label {
+    background: #0080FF;
+    height: 20px;
+    width: 20px;
+    display:inline-block;
+    padding: 0 0 0 0px;
+    font-weight: normal;
+    text-align: center;
+    margin-bottom: -5px;
+}
+
+div.label-text {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+#ack {
+  margin: 20px 0 20px 17px;
+}
+
+#ack span {
+  margin-left: 10px;
+}
+
+div#user-profile h4 {
+  margin: 15px 15px 30px 20px;
+}
+
+#user-profile div.col-sm-12 {
+  padding-left: 5px;
+}
+
+#user-profile div.col-sm-12 div.form-group {
+  margin: 15px;
+}
+
+#user-profile div.col-sm-12 div.form-group ul li label {
+  position:relative;   
+  cursor:pointer;
+  display:inline-block;
+  margin: 10px;
+}
+
+#user-profile span.user-profile-error {
+  color: #a94442;
+}
+
+input[type="radio"] {
+  display: none;
+}
+
+#survey input[type="radio"] + label {
+  color: #000;
+}
+#survey input[type="radio"]:checked + label {
+  color: #FFF;
+  background: #0080FF;
+}
+
+#survey input[type="submit"] {
+  margin-left: 15px;
+}
+
+#survey-success {
+  margin: 50px;
+}
+
+#survey .permissions-title {
+  display: inline-block;
+  width: 100px;
+}
+
+@media (min-width: 480px) {
+  #archive {
+    margin-left: 20px;
+  }
+  #archive div.dropdown {
+    border: none;
+  }
+}
+
+@media (min-width: 768px) {
+  #archive {
+    margin-left: 20px;
+  }
+  #archive div.dropdown {
+    width: 12%;
+    margin: 0;
+    border: none;
+  }
+}
+
+#archive div.dropdown {
+  display: inline-block;
+  cursor: pointer;
+  border-left: 1px solid #CCC;
+  text-align: center;
+  margin: 0 0 20px 0;
+}
+
+#archive div.dropdown span.dropdown-item {
+  display: inline-block;
+  width: 100%;
+  height: 40px;
+  padding-top: 10px;
+}
+
+#archive-menu form {
+  border-bottom: 1px solid #CCC;
+  padding-bottom: 15px;
+}
+
+#archive div.dropdown:first-of-type {
+  border-left: none;
+}
+
+#archive div.dropdown:last-of-type {
+  border-right: none;
+}
+
+#archive div.dropdown ul.dropdown-menu {
+  min-width: 90px;
+}
+
+#archive div.dropdown ul.dropdown-menu li label {
+  width: 100%;
+}
+
+#archive input[type="radio"] + label:hover {
+    color: #0080FF;
+}
+
+#archive input[type="radio"]:checked + label {
+    color: #0080FF;
+}
+
+#archive div.row {
+  margin-bottom: 40px;
+}
+
+#archive div#archive-menu {
+  margin-left: -28px;
+  margin-top: 30px;
+}
+
+#archive div#archive-menu ul.dropdown-menu {
+  border: none;
+  margin-left: 13px;
+  border-radius: 0;
+  background-color: #f1f1f1;
+  text-align: center;
+}
+
+#archive div#archive-menu ul.dropdown-menu li {
+  padding: 5px;
+}
+
+#archive div#archive-menu ul.dropdown-menu li label {
+  cursor: pointer;
+  font-weight: normal;
+}
+
+#archive div#archive-menu span#archive-menu-clear {
+  cursor: pointer;
+  margin-left: -5px;
+  font-size: 20px;
+  margin-top: 9px;
+}
+
+#archive div#archive-data {
+  
+}
+
+#archive #query-display {
+  margin-left: 5px;
+}
+
+#archive div#archive-data div.archive-profile {
+/*  width: 195px;
+  height: 350px;*/
+  /*margin: 0 55px 0 0;*/
+}
+
+#archive div#archive-data div.archive-profile img {
+  margin-left: 5px;
+}
+
+#archive div#archive-data div.archive-profile div.overlay {
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 20px;
+  width: 200px;
+  height: 80%;
+  background: #FFF;
+  opacity: 0.8;
+  padding: 10px;
+}
+
+#archive div#archive-data div.archive-profile div.overlay h5 {
+  font-weight: bold;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #CCC;
+}
+
+#archive div#archive-data div.archive-profile div.overlay h6 {
+  font-weight: bold;
+}
+
+#archive div#archive-data div.archive-profile div.overlay p {
+  font-size: 12px;
+}
+
+#archive div#archive-data div.archive-profile p {
+  margin-top: 10px;
+}
+
+#archive div#archive-data div.archive-profile p.username {
+  margin: 10px 0 40px 5px;
+}
+
+#data div.row {
+  background-color: #fff;
+  margin: 10px 0 10px 0;
+}
+
+#data #data-header {
+  padding: 20px 0 10px 0;
+  margin-bottom: 10px;
+}
+
+#data #data-header h4 {
+  font-size: 25px;
+}
+
+#data #data-header h5 {
+  font-size: 20px;
+}
+
+#data #data-stats h5 {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+#data #data-stats span {
+  display: inline-block;
+  min-width: 100px;
+  vertical-align: top;
+}
+
+#data #data-stats span div {
+  display: inline-block;
+  vertical-align: top;
+}
+
+#data #data-stats span svg {
+  display: inline-block;
+  vertical-align: top;
+}
+
+#data #data-stats span div p:first-of-type {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#data #data-stats span div p {
+  font-size: 17px;
+  margin: 0;
+}
+
+#data #data-stats div.col-sm-6 {
+  padding: 10px;
+}
+
+
