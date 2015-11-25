@@ -1,6 +1,6 @@
 from django.db import models
 
-from the_deck.models import StaticHost
+from the_deck.models.static_host import StaticHost
 
 class HostSet(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)

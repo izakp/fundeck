@@ -1,6 +1,6 @@
 from django.db import models
 
-from the_deck.models import User
+from the_deck.models.user import User
 
 class UserProfile(models.Model):
   user = models.OneToOneField(User)

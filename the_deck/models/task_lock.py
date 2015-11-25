@@ -1,12 +1,12 @@
 from django.db import models
 
-from the_deck.models import Taskset, TaskRunner
+from the_deck.models.task_set import TaskSet
+from the_deck.models.task_runner import TaskRunner
 
-class LockAcquireError(Exception):
-    pass
+from the_deck.exceptions import LockAcquireError
 
 class TaskLock(models.Model):
-    taskset = models.OneToOneField(Taskset)
+    taskset = models.OneToOneField(TaskSet)
     lock_holder = models.OneToOneField(TaskRunner, null=True)
 
     #Note: In context manger

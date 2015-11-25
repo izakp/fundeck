@@ -1,13 +1,16 @@
 from django.db import models
 
-from the_deck.models import Task, Group, UserProfile, Hostset
+from the_deck.models.task import Task
+from the_deck.models.group import Group
+from the_deck.models.user_profile import UserProfile
+from the_deck.models.host_set import HostSet
 
-class Taskset(models.Model):
+class TaskSet(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     tasks = models.ManyToManyField(Task) # TODO order?
-    hostsets = models.ManyToManyField(Hostset)
+    hostsets = models.ManyToManyField(HostSet)
     groups = models.ManyToManyField(Group)
     user_profiles = models.ManyToManyField(UserProfile)
 

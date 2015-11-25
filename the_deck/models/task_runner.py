@@ -2,8 +2,10 @@ from django.db import models
 
 from celery import group
 
-from the_deck.models import User, Taskset
-from the_deck.models.tasklock import LockAcquireError
+from the_deck.models.user import User
+from the_deck.models.task_set import TaskSet
+
+from the_deck.exceptions import LockAcquireError
 
 from the_deck.tasks import rsetup, rpreflight, rexecute, rteardown, TaskResponse
 
@@ -31,7 +33,7 @@ class TaskRunner(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    taskset = models.ForeignKey(Taskset)
+    taskset = models.ForeignKey(TaskSet)
     user = models.OneToOneField(User)
 
     setup_task_id = models.CharField(max_length=128)

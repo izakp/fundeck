@@ -1,6 +1,6 @@
 from django.db import models
 
-from the_deck.models import UserProfile
+from the_deck.models.user_profile import UserProfile
 
 class Group(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
