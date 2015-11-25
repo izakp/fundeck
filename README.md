@@ -14,7 +14,7 @@ Goals:
 
 	- ACLs manageable via admin interface (User and Group Permissions)
 
-	- Modular task models, should support chained execution, setup, preflight (dry-run), and teardown context guards
+	- Modular task models, should support chained execution
 
 	- Secure storage and easy management of multiple private keys
 

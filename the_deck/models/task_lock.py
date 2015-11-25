@@ -19,6 +19,9 @@ class TaskLock(models.Model):
         self.save()
         return self
 
+    def lock_acquired(self, task_runner):
+        return self.is_locked and self.lock_holder == task_runner
+
     def release_lock(self):
         self.lock_holder = None
         self.save()

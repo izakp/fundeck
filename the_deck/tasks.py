@@ -49,37 +49,6 @@ class TaskResult(object):
 
         return self.stdout.splitlines()
 
-
-@app.task
-def rsetup(tasklist, host, username):
-    responses = []
-    for task_id in tasklist:
-        task = Task(task_id)
-        if task.setup_command is None:
-            responses.append(TaskResult())
-            continue
-        try:
-            result = run_paramiko(task.setup_command, host=host, username=username)
-        except SSHException, e:
-            responses.append(TaskResult(error=e))
-        responses.append(TaskResult(result=result))
-    return responses
-
-@app.task
-def rpreflight(tasklist, host, username):
-    responses = []
-    for task_id in tasklist:
-        task = Task(task_id)
-        if task.preflight_command is None:
-            responses.append(TaskResult())
-            continue
-        try:
-            result = run_paramiko(task.preflight_command, host=host, username=username)
-        except SSHException, e:
-            responses.append(TaskResult(error=e))
-        responses.append(TaskResult(result=result))
-    return responses
-
 @app.task
 def rexecute(tasklist, host, username):
     responses = []
@@ -87,21 +56,6 @@ def rexecute(tasklist, host, username):
         task = Task(task_id)
         try:
             result = run_paramiko(task.run_command, host=host, username=username)
-        except SSHException, e:
-            responses.append(TaskResult(error=e))
-        responses.append(TaskResult(result=result))
-    return responses
-
-@app.task
-def rteardown(tasklist, host, username):
-    responses = []
-    for task_id in tasklist:
-        task = Task(task_id)
-        if task.teardown_command is None:
-            responses.append(TaskResult())
-            continue
-        try:
-            result = run_paramiko(task.teardown_command, host=host, username=username)
         except SSHException, e:
             responses.append(TaskResult(error=e))
         responses.append(TaskResult(result=result))

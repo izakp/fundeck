@@ -21,21 +21,3 @@ class TaskSet(models.Model):
 
     def get_hosts(self):
         return [hostset.get_hosts() for hostset in self.hostsets]
-
-    def requires_setup(self):
-        for task in self.tasks:
-            if task.setup_command is not None:
-                return True
-        return False
-
-    def requires_preflight(self):
-        for task in self.tasks:
-            if task.preflight_command is not None:
-                return True
-        return False
-
-    def requires_teardown(self):
-        for task in self.tasks:
-            if task.teardown_command is not None:
-                return True
-        return False
