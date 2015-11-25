@@ -1,6 +1,5 @@
-from dynamic_hosts import DynamicHosts
-from group import Group
 from host_set import HostSet
+from inventory import Inventory
 from static_host import StaticHost
 from task import Task
 from task_log import TaskLog

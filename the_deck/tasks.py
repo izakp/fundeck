@@ -4,7 +4,7 @@ import traceback
 
 from fundeck.celery import app
 
-from the_deck.models import TaskSet
+from the_deck.models.task_set import TaskSet
 from the_deck.lib.task_result import TaskResult
 from the_deck.lib.remote_command import RemoteCommand
 

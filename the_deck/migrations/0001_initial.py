@@ -13,32 +13,27 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='DynamicHosts',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('adapter', models.IntegerField(default=0, choices=[(0, b'CHEF_CLIENT')])),
-                ('query', models.CharField(max_length=512)),
-            ],
-        ),
-        migrations.CreateModel(
-            name='Group',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=256)),
-            ],
-        ),
-        migrations.CreateModel(
             name='HostSet',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('dynamic_hosts', models.ManyToManyField(to='the_deck.DynamicHosts')),
+                ('name', models.CharField(max_length=128)),
             ],
+        ),
+        migrations.CreateModel(
+            name='Inventory',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('name', models.CharField(max_length=128)),
+                ('adapter', models.IntegerField(default=0, choices=[(0, b'CHEF_CLIENT')])),
+                ('query', models.CharField(max_length=512)),
+            ],
+            options={
+                'verbose_name_plural': 'inventories',
+            },
         ),
         migrations.CreateModel(
             name='StaticHost',
@@ -46,6 +41,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
+                ('name', models.CharField(max_length=128)),
                 ('fqdn', models.CharField(max_length=128)),
                 ('is_active', models.BooleanField(default=True)),
             ],
@@ -58,6 +54,14 @@ class Migration(migrations.Migration):
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('name', models.CharField(max_length=128)),
                 ('run_command', models.TextField()),
+            ],
+        ),
+        migrations.CreateModel(
+            name='TaskList',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('order', models.PositiveIntegerField()),
+                ('task', models.ForeignKey(to='the_deck.Task')),
             ],
         ),
         migrations.CreateModel(
@@ -96,10 +100,10 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
+                ('name', models.CharField(max_length=128)),
                 ('remote_user', models.CharField(max_length=128)),
-                ('groups', models.ManyToManyField(to='the_deck.Group')),
                 ('hostsets', models.ManyToManyField(to='the_deck.HostSet')),
-                ('tasks', models.ManyToManyField(to='the_deck.Task')),
+                ('tasks', models.ManyToManyField(to='the_deck.Task', through='the_deck.TaskList')),
             ],
         ),
         migrations.CreateModel(
@@ -124,11 +128,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.AddField(
-            model_name='taskset',
-            name='user_profiles',
-            field=models.ManyToManyField(to='the_deck.UserProfile'),
-        ),
-        migrations.AddField(
             model_name='taskrunner',
             name='taskset',
             field=models.ForeignKey(to='the_deck.TaskSet'),
@@ -144,13 +143,18 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(to='the_deck.TaskRunner'),
         ),
         migrations.AddField(
+            model_name='tasklist',
+            name='taskset',
+            field=models.ForeignKey(to='the_deck.TaskSet'),
+        ),
+        migrations.AddField(
+            model_name='hostset',
+            name='inventories',
+            field=models.ManyToManyField(to='the_deck.Inventory'),
+        ),
+        migrations.AddField(
             model_name='hostset',
             name='static_hosts',
             field=models.ManyToManyField(to='the_deck.StaticHost'),
-        ),
-        migrations.AddField(
-            model_name='group',
-            name='user_profile',
-            field=models.ManyToManyField(to='the_deck.UserProfile'),
         ),
     ]

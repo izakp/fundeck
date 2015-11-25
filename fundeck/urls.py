@@ -18,5 +18,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^$', 'the_deck.views.home', name='home'),
+    # url(r'^$', 'the_deck.views.home', name='home'),
+    url('^', include('django.contrib.auth.urls')),
 ]

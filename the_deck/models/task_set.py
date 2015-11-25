@@ -1,8 +1,6 @@
 from django.db import models
 
 from the_deck.models.task import Task
-from the_deck.models.group import Group
-from the_deck.models.user_profile import UserProfile
 from the_deck.models.host_set import HostSet
 
 from the_deck.lib.helpers import flatten
@@ -10,13 +8,16 @@ from the_deck.lib.helpers import flatten
 class TaskSet(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=128)
 
     remote_user = models.CharField(max_length=128)
     hostsets = models.ManyToManyField(HostSet)
-    tasks = models.ManyToManyField(Task) # TODO order of ops http://stackoverflow.com/questions/19901818/ordering-many-to-many-relations-in-django-models
-
-    groups = models.ManyToManyField(Group)
-    user_profiles = models.ManyToManyField(UserProfile)
+    tasks = models.ManyToManyField(Task, through='TaskList')
 
     def get_hosts(self):
         return flatten([hostset.get_hosts() for hostset in self.hostsets])
+
+class TaskList(models.Model):
+    order = models.PositiveIntegerField()
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    taskset = models.ForeignKey(TaskSet, on_delete=models.CASCADE)
