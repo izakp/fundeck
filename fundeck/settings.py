@@ -6,16 +6,15 @@ from __future__ import absolute_import
 
 # Celery settings
 
-# BROKER_URL = 'redis://localhost:6379/0'
-BROKER_URL = 'django://'
+BROKER_URL = 'redis://localhost:6379/0'
 
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['pickle']
+CELERY_TASK_SERIALIZER = 'pickle'
+CELERY_RESULT_SERIALIZER = 'pickle'
 
-CELERY_RESULT_BACKEND = 'db+sqlite:///task_results.sqlite'
+CELERY_RESULT_BACKEND = 'redis://localhost/0'
 
 """
 Django settings for fundeck project.

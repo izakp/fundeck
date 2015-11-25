@@ -38,6 +38,7 @@ class RemoteCommand(object):
         client.connect(self.host, username=self.username)
 
         channel = client.get_transport().open_session()
+        channel.input_enabled = True
         channel.exec_command(self.command)
 
         stdout_buf, stderr_buf = [], []

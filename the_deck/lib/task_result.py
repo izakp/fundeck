@@ -3,6 +3,7 @@ class TaskResult(object):
         assert (result and not error) or (error and not result), "result xor error are required"
 
         if result is not None:
+            self.succeeded = True
             self.failed = False
             self.error = None
             stdout_buf, stderr_buf, status = result
@@ -11,15 +12,18 @@ class TaskResult(object):
             self.status = status
 
         if error is not None:
+            self.succeeded = False
             self.failed = True
             self.error = error
             self.stdout = None
             self.stderr = None
             self.status = None
 
+    @property
     def remote_command_failed(self):
         return self.status != 0
 
+    @property
     def human_result(self):
         if self.failed:
             return self.error.splitlines()
