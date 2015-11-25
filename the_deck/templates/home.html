@@ -8,21 +8,7 @@
       <h2>Welcome to Fundeck</h2>
     </div>
 
-    <div>
-        <h4>Status</h4>
-        <p>{{ status }}</p>
-        </br>
-        {% if status == "SUCCESS" %}
-        <h4>Results</h4>
-        {% for host, responses in results %}
-            <h6>{{ host }}</h6>
-                {% for l in responses %}
-                <p>{{ l }}</p>
-                {% endfor %}
-        {% endfor %}
-        </br>
-        {% endif %}
-    </div>
+
   </div>
 </div>
 {% endblock %}
