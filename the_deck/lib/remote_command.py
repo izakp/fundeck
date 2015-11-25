@@ -8,6 +8,19 @@ from fabric.io import output_loop, input_loop
 
 from thread_handling import ThreadHandler
 
+"""
+TODO
+
+Thread Pool for stdin,stdout,stderr - pipe via Redis  LPUSH/RPOP?
+
+http://docs.fabfile.org/en/1.10/api/core/operations.html#fabric.operations.run
+
+Implementation: https://github.com/fabric/fabric/blob/5217b12f8aca3bc071206f7f4168e62c003509d1/fabric/operations.py#L721
+
+No parallel operations (no forking within multiprocessign if possible)
+
+"""
+
 class RemoteCommand(object):
     def __init__(self, command, host, username, timeout=300, stdout=None, stderr=None):
         self.command = command

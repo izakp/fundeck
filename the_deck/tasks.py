@@ -6,7 +6,7 @@ from fundeck.celery import app
 
 from the_deck.models import Task
 from the_deck.lib.task_result import TaskResult
-from the_deck.remote_tasks import run_paramiko
+from the_deck.lib.remote_command import RemoteCommand
 
 from paramiko import SSHException
 
@@ -16,7 +16,8 @@ def rexecute(tasklist, host, username):
     for task_id in tasklist:
         task = Task(task_id)
         try:
-            result = run_paramiko(task.run_command, host=host, username=username)
+            command_runner = RemoteCommand(task.run_command, host, username)
+            result = command_runner.run()
         except SSHException:
             e = traceback.format_exc()
             responses.append(TaskResult(error=e))
