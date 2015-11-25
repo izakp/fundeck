@@ -1,6 +1,8 @@
 class TaskResult(object):
-    def __init__(self, result=None, error=None):
+    def __init__(self, task_id=None, result=None, error=None):
         assert (result and not error) or (error and not result), "result xor error are required"
+
+        self.task_id = task_id
 
         if result is not None:
             self.succeeded = True
@@ -30,3 +32,9 @@ class TaskResult(object):
         if self.status != 0:
             return self.stderr.splitlines()
         return self.stdout.splitlines()
+
+    def get_stdout(self):
+        return self.stdout.splitlines()
+
+    def get_stderr(self):
+        return self.stderr.splitlines()

@@ -14,6 +14,9 @@ class TaskSet(models.Model):
     hostsets = models.ManyToManyField(HostSet)
     tasks = models.ManyToManyField(Task, through='TaskList')
 
+    def get_task_ids(self):
+        return [task.id for task in self.tasks]
+
     def get_hosts(self):
         return flatten([hostset.get_hosts() for hostset in self.hostsets])
 

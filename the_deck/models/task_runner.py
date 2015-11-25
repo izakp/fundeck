@@ -3,13 +3,14 @@ from django.db import models
 from celery import group
 from celery.result import GroupResult
 
-from the_deck.models.user import User
+from the_deck.models.user_profile import UserProfile
 from the_deck.models.task_set import TaskSet
+from the_deck.models.task_run_result import TaskRunResult
 
 from the_deck.exceptions import LockAcquireError
 
 from the_deck.lib.task_result import TaskResult
-from the_deck.tasks import execute_taskset
+from the_deck.worker import execute_tasks
 
 class TaskRunner(models.Model):
     CREATED = 0
@@ -30,7 +31,7 @@ class TaskRunner(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     taskset = models.ForeignKey(TaskSet)
-    user = models.OneToOneField(User)
+    user_profile = models.ForeignKey(UserProfile)
 
     task_id = models.CharField(max_length=128)
 
@@ -58,7 +59,6 @@ class TaskRunner(models.Model):
 
         self.state = self.PENDING
         self.save()
-        return self
 
     def try_run(self):
         if not self.taskset.tasklock.lock_acquired(self):
@@ -66,23 +66,33 @@ class TaskRunner(models.Model):
         self.run()
 
     def run(self):
-        signatures = [execute_taskset.s(self.taskset.id, host) for host in self.taskset.get_hosts()]
+        signatures = [execute_tasks.s(self.taskset.get_task_ids(), host, self.taskset.remote_user) for host in self.taskset.get_hosts()]
         task_group_result = group(signatures)()
         task_group_result.save()
 
         self.task_id = task_group_result.id
         self.state = self.RUNNING
         self.save()
-        return self
 
     def try_finalize(self):
         task_group_result = GroupResult.restore(self.task_id)
         if not task_group_result.ready():
             return None
 
-        # TODO handle results - TaskResult
+        results = task_group_result.get()
+        all_tasks_succeeded = True
+        for result in results:
+            task = Task(result.task_id)
+            if result.failed:
+                TaskRunResult.create(task_runner=self, task=task, result=result.error, is_error=True)
+                all_tasks_succeeded = False
+            if result.remote_command_failed:
+                TaskRunResult.create(task_runner=self, task=task, result=result.stderr, is_error=True)
+                all_tasks_succeeded = False
+            if result.succeeded:
+                TaskRunResult.create(task_runner=self, task=task, result=result.stdout)
 
-        return self.finalize(True)
+        self.finalize(all_tasks_succeeded)
 
     def finalize(self, success):
 
@@ -94,7 +104,6 @@ class TaskRunner(models.Model):
             self.state = self.FAILED
 
         self.save()
-        return self
 
     def is_finalized(self):
         return self.state in [self.SUCCEEDED, self.FAILED]

@@ -91,6 +91,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('result', models.TextField()),
                 ('is_error', models.BooleanField(default=False)),
+                ('task', models.ForeignKey(to='the_deck.Task')),
                 ('task_runner', models.ForeignKey(to='the_deck.TaskRunner')),
             ],
         ),
@@ -104,16 +105,6 @@ class Migration(migrations.Migration):
                 ('remote_user', models.CharField(max_length=128)),
                 ('hostsets', models.ManyToManyField(to='the_deck.HostSet')),
                 ('tasks', models.ManyToManyField(to='the_deck.Task', through='the_deck.TaskList')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='User',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=128)),
-                ('email', models.EmailField(max_length=254)),
             ],
         ),
         migrations.CreateModel(
@@ -134,8 +125,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='taskrunner',
-            name='user',
-            field=models.OneToOneField(to='the_deck.User'),
+            name='user_profile',
+            field=models.ForeignKey(to='the_deck.UserProfile'),
         ),
         migrations.AddField(
             model_name='tasklog',
