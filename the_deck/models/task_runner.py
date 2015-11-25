@@ -9,7 +9,7 @@ from the_deck.models.task_set import TaskSet
 from the_deck.exceptions import LockAcquireError
 
 from the_deck.lib.task_result import TaskResult
-from the_deck.tasks import rexecute
+from the_deck.tasks import execute_taskset
 
 class TaskRunner(models.Model):
     CREATED = 0
@@ -66,7 +66,7 @@ class TaskRunner(models.Model):
         self.run()
 
     def run(self):
-        signatures = [rexecute.s(self.taskset.get_tasklist(), host, self.taskset.remote_user) for host in self.taskset.get_hosts()]
+        signatures = [execute_taskset.s(self.taskset.id, host) for host in self.taskset.get_hosts()]
         task_group_result = group(signatures)()
         task_group_result.save()
 

@@ -1,7 +1,5 @@
 from django.shortcuts import render
 
-from the_deck.tasks import rexecute
-
 import logging
 logger = logging.getLogger(__name__)
 

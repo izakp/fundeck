@@ -18,8 +18,5 @@ class TaskSet(models.Model):
     groups = models.ManyToManyField(Group)
     user_profiles = models.ManyToManyField(UserProfile)
 
-    def get_tasklist(self):
-        return [task.id for task in self.tasks]
-
     def get_hosts(self):
         return flatten([hostset.get_hosts() for hostset in self.hostsets])
