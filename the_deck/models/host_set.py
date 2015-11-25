@@ -11,7 +11,11 @@ class HostSet(models.Model):
     dynamic_hosts = models.ManyToManyField(DynamicHosts)
 
     def get_hosts(self):
-        hosts = [host.ip for host in self.static_hosts]
+        hosts = []
+        for static_host in self.static_hosts:
+            if not static_host.is_active:
+                continue
+            hosts.append(static_host.fqdn)
         for dynamic_host in self.dynamic_hosts:
-        	hosts.extend(dynamic_host.ips())
+        	hosts.extend(dynamic_host.fqdns())
         return hosts

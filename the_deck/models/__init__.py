@@ -7,5 +7,4 @@ from task_log import TaskLog
 from task_run_result import TaskRunResult
 from task_runner import TaskRunner
 from task_set import TaskSet
-from user import User
 from user_profile import UserProfile

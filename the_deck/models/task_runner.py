@@ -8,7 +8,8 @@ from the_deck.models.task_set import TaskSet
 
 from the_deck.exceptions import LockAcquireError
 
-from the_deck.tasks import rexecute, TaskResult
+from the_deck.lib.task_result import TaskResult
+from the_deck.tasks import rexecute
 
 class TaskRunner(models.Model):
     CREATED = 0
@@ -38,7 +39,7 @@ class TaskRunner(models.Model):
 
     def tick(self):
         if self.is_finalized():
-            return False
+            return True
 
         if self.state == self.CREATED:
             self.try_acquire_tasklock()
@@ -47,7 +48,7 @@ class TaskRunner(models.Model):
         elif self.state == self.RUNNING:
             self.try_finalize()
 
-        return True
+        return False
 
     def try_acquire_tasklock(self):
         try:
@@ -66,15 +67,17 @@ class TaskRunner(models.Model):
 
     def run(self):
         signatures = [rexecute.s(self.taskset.get_tasklist(), host, self.taskset.remote_user) for host in self.taskset.get_hosts()]
-        task_group = group(signatures)()
-        self.task_id = task_group.id
+        task_group_result = group(signatures)()
+        task_group_result.save()
+
+        self.task_id = task_group_result.id
         self.state = self.RUNNING
         self.save()
         return self
 
     def try_finalize(self):
-        task_group = GroupResult.restore(self.task_id)
-        if not task_group.ready():
+        task_group_result = GroupResult.restore(self.task_id)
+        if not task_group_result.ready():
             return None
 
         # TODO handle results - TaskResult

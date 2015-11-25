@@ -1,6 +1,6 @@
 from django.db import models
 
-from the_deck.models.user import User
+from django.contrib.auth.models import User
 
 class UserProfile(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)

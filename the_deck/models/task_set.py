@@ -5,6 +5,8 @@ from the_deck.models.group import Group
 from the_deck.models.user_profile import UserProfile
 from the_deck.models.host_set import HostSet
 
+from the_deck.lib.helpers import flatten
+
 class TaskSet(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -20,4 +22,4 @@ class TaskSet(models.Model):
         return [task.id for task in self.tasks]
 
     def get_hosts(self):
-        return [hostset.get_hosts() for hostset in self.hostsets]
+        return flatten([hostset.get_hosts() for hostset in self.hostsets])

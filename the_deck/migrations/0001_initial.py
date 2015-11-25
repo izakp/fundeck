@@ -2,11 +2,13 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
@@ -16,8 +18,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('adapter', models.CharField(max_length=128)),
-                ('query_parameters', models.CharField(max_length=128, blank=True)),
+                ('adapter', models.IntegerField(default=0, choices=[(0, b'CHEF_CLIENT')])),
+                ('query', models.CharField(max_length=512)),
             ],
         ),
         migrations.CreateModel(
@@ -44,7 +46,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('ip', models.CharField(max_length=128)),
+                ('fqdn', models.CharField(max_length=128)),
                 ('is_active', models.BooleanField(default=True)),
             ],
         ),
@@ -106,8 +108,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
+                ('name', models.CharField(max_length=128)),
                 ('email', models.EmailField(max_length=254)),
-                ('password', models.CharField(max_length=128)),
             ],
         ),
         migrations.CreateModel(
@@ -118,7 +120,7 @@ class Migration(migrations.Migration):
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('username', models.CharField(max_length=128)),
                 ('is_admin', models.BooleanField(default=False)),
-                ('user', models.OneToOneField(to='the_deck.User')),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.AddField(
