@@ -1,13 +1,14 @@
 from django.db import models
 
 from celery import group
+from celery.result import GroupResult
 
 from the_deck.models.user import User
 from the_deck.models.task_set import TaskSet
 
 from the_deck.exceptions import LockAcquireError
 
-from the_deck.tasks import rsetup, rpreflight, rexecute, rteardown, TaskResponse
+from the_deck.tasks import rsetup, rpreflight, rexecute, rteardown, TaskResult
 
 class TaskRunner(models.Model):
     CREATED = 0
@@ -45,48 +46,67 @@ class TaskRunner(models.Model):
     fail_as_group = models.BooleanField(default=False)
 
     def tick(self):
-        if self.state == CREATED:
+        if self.is_finalized():
+            return None
+
+        if self.state == self.CREATED:
             self.try_acquire_tasklock()
-        elif self.state == PENDING:
-            self.try_enter_setup()
-        elif self.state == SETUP:
-            self.try_enter_preflight()
-        elif self.state == PREFLIGHT:
+        elif self.state == self.PENDING:
+            self.try_setup()
+        elif self.state == self.SETUP:
+            self.try_preflight()
+        elif self.state == self.PREFLIGHT:
             self.try_run()
-        elif self.state == RUNNING:
+        elif self.state == self.RUNNING:
             self.try_teardown()
-        elif self.state == TEARDOWN:
+        elif self.state == self.TEARDOWN:
             self.try_finalize()
-        # elif self.state == SUCCEEDED:
-        #     self.finalize()
-        # elif self.state == FAILED:
-        #     self.finalize()
+        elif self.state == SUCCEEDED:
+            self.finalize(True)
+        elif self.state == FAILED:
+            self.finalize(False)
 
     def create_task_group(self, func):
-        signatures = [func.s(self.taskset.get_tasklist(), host) for host in self.taskset.get_hosts()]
+        signatures = [func.s(self.taskset.get_tasklist(), host, self.taskset.remote_user) for host in self.taskset.get_hosts()]
         return group(signatures)()
 
     def try_acquire_tasklock(self):
         try:
             self.taskset.tasklock.acquire_lock(self)
         except LockAcquireError:
-            pass
+            return None
+
         self.state = self.PENDING
         self.save()
         return self
 
-    def try_enter_setup(self):
-        pass
+    def try_setup(self):
+        if self.taskset.requires_setup():
+            return self.setup()
+        else:
+            return self.try_preflight()
 
     def setup(self):
         task_group = self.create_task_group(rsetup)
+        task_group.save()
+
         self.setup_task_id = task_group.id
         self.state = self.SETUP
         self.save()
         return self
 
-    def try_enter_preflight(self):
-        pass
+    def try_preflight(self):
+        if self.taskset.requires_setup():
+            task_group = GroupResult.restore(self.setup_task_id)
+            if not task_group.ready():
+                return None
+
+            # TODO handle setup results - TaskResult
+
+        if self.taskset.requires_preflight():
+            return self.preflight()
+        else:
+            return self.run()
 
     def preflight(self):
         task_group = self.create_task_group(rpreflight)
@@ -96,7 +116,14 @@ class TaskRunner(models.Model):
         return self
 
     def try_run(self):
-        pass
+        if self.taskset.requires_preflight():
+            task_group = GroupResult.restore(self.preflight_task_id)
+            if not task_group.ready():
+                return None
+
+            # TODO handle preflight results - TaskResult
+
+        return self.run()
 
     def run(self):
         task_group = self.create_task_group(rexecute)
@@ -106,20 +133,44 @@ class TaskRunner(models.Model):
         return self
 
     def try_teardown(self):
-        pass
+        task_group = GroupResult.restore(self.run_task_id)
+        if not task_group.ready():
+            return None
+
+        # TODO handle run results
+
+        if self.taskset.requires_teardown():
+            return self.teardown()
+        else:
+            return self.finalize()
 
     def teardown(self):
         task_group = self.create_task_group(rteardown)
         self.teardown_task_id = task_group.id
         self.state = self.TEARDOWN
         self.save()
-
-        self.tasklock.release_lock()
-
         return self
 
     def try_finalize(self):
-        pass
+        task_group = GroupResult.restore(self.teardown_task_id)
+        if not task_group.ready():
+            return None
 
-    def finalize(self):
-        pass
+        # TODO finalize results - TaskResult
+
+        return self.finalize()
+
+    def finalize(self, success):
+
+        self.tasklock.release_lock()
+
+        if success:
+            self.state = self.SUCCEEDED
+        else:
+            self.state = self.FAILED
+
+        self.save()
+        return self
+
+    def is_finalized(self):
+        return self.state in [self.SUCCEEDED, self.FAILED]

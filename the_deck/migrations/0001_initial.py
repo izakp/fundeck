@@ -11,11 +11,22 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='DynamicHosts',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('adapter', models.CharField(max_length=128)),
+                ('query_parameters', models.CharField(max_length=128, blank=True)),
+            ],
+        ),
+        migrations.CreateModel(
             name='Group',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
+                ('name', models.CharField(max_length=256)),
             ],
         ),
         migrations.CreateModel(
@@ -24,6 +35,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
+                ('dynamic_hosts', models.ManyToManyField(to='the_deck.DynamicHosts')),
             ],
         ),
         migrations.CreateModel(
@@ -33,6 +45,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('ip', models.CharField(max_length=128)),
+                ('is_active', models.BooleanField(default=True)),
             ],
         ),
         migrations.CreateModel(
@@ -52,7 +65,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('level', models.CharField(max_length=5)),
+                ('level', models.CharField(default=b'INFO', max_length=5)),
                 ('log', models.CharField(max_length=512)),
             ],
         ),
@@ -71,11 +84,22 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='TaskRunResult',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('result', models.TextField()),
+                ('is_error', models.BooleanField(default=False)),
+                ('task_runner', models.ForeignKey(to='the_deck.TaskRunner')),
+            ],
+        ),
+        migrations.CreateModel(
             name='TaskSet',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
+                ('remote_user', models.CharField(max_length=128)),
                 ('groups', models.ManyToManyField(to='the_deck.Group')),
                 ('hostsets', models.ManyToManyField(to='the_deck.HostSet')),
                 ('tasks', models.ManyToManyField(to='the_deck.Task')),
@@ -87,7 +111,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=128)),
                 ('email', models.EmailField(max_length=254)),
                 ('password', models.CharField(max_length=128)),
             ],
@@ -98,6 +121,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
+                ('username', models.CharField(max_length=128)),
                 ('is_admin', models.BooleanField(default=False)),
                 ('user', models.OneToOneField(to='the_deck.User')),
             ],

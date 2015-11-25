@@ -9,10 +9,8 @@ class TaskLock(models.Model):
     taskset = models.OneToOneField(TaskSet)
     lock_holder = models.OneToOneField(TaskRunner, null=True)
 
-    #Note: In context manger
-
     def is_locked(self):
-        return self.lock is not None
+        return self.lock_holder is not None
 
     def acquire_lock(self, task_runner):
         if self.is_locked():

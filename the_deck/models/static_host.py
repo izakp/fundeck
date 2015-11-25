@@ -5,3 +5,5 @@ class StaticHost(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     ip = models.CharField(max_length=128)
+
+    is_active = models.BooleanField(default=True)

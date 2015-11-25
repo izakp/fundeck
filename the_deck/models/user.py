@@ -4,7 +4,6 @@ class User(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at = models.DateTimeField(auto_now=True)
 
-  name = models.CharField(max_length=128)
   email = models.EmailField()
   password = models.CharField(max_length=128)
 
