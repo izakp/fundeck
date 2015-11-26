@@ -9,7 +9,6 @@ from the_deck.models.task_run_result import TaskRunResult
 
 from the_deck.exceptions import LockAcquireError
 
-from the_deck.lib.task_result import TaskResult
 from the_deck.worker import execute_tasks
 
 class TaskRunner(models.Model):

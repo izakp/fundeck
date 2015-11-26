@@ -17,8 +17,6 @@ http://docs.fabfile.org/en/1.10/api/core/operations.html#fabric.operations.run
 
 Implementation: https://github.com/fabric/fabric/blob/5217b12f8aca3bc071206f7f4168e62c003509d1/fabric/operations.py#L721
 
-No parallel operations (no forking within multiprocessign if possible)
-
 """
 
 class RemoteCommand(object):
@@ -78,3 +76,52 @@ class RemoteCommand(object):
         stderr_buf = ''.join(stderr_buf).strip()
 
         return stdout_buf, stderr_buf, status
+
+
+class CommandResult(object):
+    def __init__(self, task_id=None, result=None, error=None):
+        assert (result and not error) or (error and not result), "result xor error are required"
+
+        self.task_id = task_id
+
+        if result is not None:
+            self.succeeded = True
+            self.failed = False
+            self.error = None
+            stdout_buf, stderr_buf, status = result
+            self.stdout = stdout_buf
+            self.stderr = stderr_buf
+            self.status = int(status)
+
+        if error is not None:
+            self.succeeded = False
+            self.failed = True
+            self.error = error
+            self.stdout = None
+            self.stderr = None
+            self.status = None
+
+    @property
+    def remote_command_failed(self):
+        return self.status != 0
+
+    @property
+    def result(self):
+        if self.failed:
+            return self.error
+        if self.status != 0:
+            return self.stderr
+        return self.stdout
+
+    @property
+    def result_as_list(self):
+        return self.human_result.splitlines()
+
+    @property
+    def stdout_as_list(self):
+        return self.stdout.splitlines()
+
+    @property
+    def stderr_as_list(self):
+        return self.stderr.splitlines()
+
