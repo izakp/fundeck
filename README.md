@@ -8,8 +8,6 @@ Goals:
 
 	- Should easily plug into ChefServer and PuppetDB APIs to generate dyanmic instance catalogues
 
-	- Should uspport static host definitions
-
 	- User signup via organization (google OAuth or invites)
 
 	- ACLs manageable via admin interface (User and Group Permissions)
@@ -24,20 +22,11 @@ Done:
 
 Todo:
 
-	- Finish model structure
-
-	- Build task execution strategies / context guards (FSM)
-
 	- User Auth
 
 	- Expose TaskRunner state transitions via API
 
 	- Frontend Interface @_@
-
-	- Swap Fabric for underlying Paramiko method calls
-
-	- Work around https://github.com/celery/celery/issues/1709
-
 
 ## Fundeck
 
@@ -58,7 +47,7 @@ Development:
 
 `python ./manage.py runserver`
 
-`celery -A fundeck worker -l info`
+`celery -A fundeck worker -l debug`
 
 Production:
 
