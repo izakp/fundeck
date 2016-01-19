@@ -40,7 +40,8 @@ def run_task(task_id):
 
     command_runner = RemoteCommand(task.command, 
                                     task.host,
-                                    task.username)
+                                    task.username,
+                                    task.task_runner.task_group.ssh_user.private_key)
     result = command_runner.run()
 
     logger.info(task_id)

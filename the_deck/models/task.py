@@ -33,4 +33,4 @@ class Task(models.Model):
     error = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return 'Run "%s" on %s at %s' % (self.command, self.host, self.created_at)
+        return 'Run "%s" on %s by %s at %s' % (self.command, self.host, self.username, self.created_at)

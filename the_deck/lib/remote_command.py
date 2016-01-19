@@ -4,6 +4,8 @@ import time
 
 import traceback
 
+import cStringIO
+
 import paramiko
 
 from fabric.io import output_loop, input_loop
@@ -22,10 +24,11 @@ Implementation: https://github.com/fabric/fabric/blob/5217b12f8aca3bc071206f7f41
 """
 
 class RemoteCommand(object):
-    def __init__(self, command, host, username, timeout=300, stdout=None, stderr=None):
+    def __init__(self, command, host, username, pkey, timeout=300, stdout=None, stderr=None):
         self.command = command
         self.host = host
         self.username = username
+        self.pkey = pkey
         self.timeout = timeout
         self.stdout = stdout or sys.stdout
         self.stderr = stderr or sys.stderr
@@ -34,9 +37,11 @@ class RemoteCommand(object):
         try:
             client = paramiko.SSHClient()
             client.load_system_host_keys()
-            client.set_missing_host_key_policy(paramiko.WarningPolicy())
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-            client.connect(self.host, username=self.username)
+            pkey = paramiko.RSAKey.from_private_key(cStringIO.StringIO(self.pkey))
+            client.connect(self.host, username=self.username,
+                            look_for_keys=False, pkey=pkey)
 
             channel = client.get_transport().open_session()
             channel.input_enabled = True
