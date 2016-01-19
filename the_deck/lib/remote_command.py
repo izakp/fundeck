@@ -2,6 +2,8 @@ import select
 import sys
 import time
 
+import traceback
+
 import paramiko
 
 from fabric.io import output_loop, input_loop
@@ -29,15 +31,19 @@ class RemoteCommand(object):
         self.stderr = stderr or sys.stderr
 
     def run(self):
-        client = paramiko.SSHClient()
-        client.load_system_host_keys()
-        client.set_missing_host_key_policy(paramiko.WarningPolicy())
+        try:
+            client = paramiko.SSHClient()
+            client.load_system_host_keys()
+            client.set_missing_host_key_policy(paramiko.WarningPolicy())
 
-        client.connect(self.host, username=self.username)
+            client.connect(self.host, username=self.username)
 
-        channel = client.get_transport().open_session()
-        channel.input_enabled = True
-        channel.exec_command(self.command)
+            channel = client.get_transport().open_session()
+            channel.input_enabled = True
+            channel.exec_command(self.command)
+        except paramiko.SSHException:
+            e = traceback.format_exc()
+            return CommandResult(error=e)
 
         stdout_buf, stderr_buf = [], []
 
@@ -75,14 +81,12 @@ class RemoteCommand(object):
         stdout_buf = ''.join(stdout_buf).strip()
         stderr_buf = ''.join(stderr_buf).strip()
 
-        return stdout_buf, stderr_buf, status
+        return CommandResult(result=(stdout_buf, stderr_buf, status))
 
 
 class CommandResult(object):
-    def __init__(self, task_id=None, result=None, error=None):
+    def __init__(self, result=None, error=None):
         assert (result and not error) or (error and not result), "result xor error are required"
-
-        self.task_id = task_id
 
         if result is not None:
             self.succeeded = True
