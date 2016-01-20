@@ -15,6 +15,7 @@ CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
 
 CELERY_RESULT_BACKEND = 'redis://localhost/0'
+# CELERY_CHORD_PROPAGATES = False
 
 """
 Django settings for fundeck project.
@@ -99,8 +100,12 @@ WSGI_APPLICATION = 'fundeck.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': "fundeck",
+        'USER': "fundeck",
+        'HOST': "localhost",
+        'PASSWORD': '',
+        'PORT': ''
     }
 }
 

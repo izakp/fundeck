@@ -29,6 +29,7 @@ class Task(models.Model):
     stdout = models.TextField(null=True, blank=True)
     stderr = models.TextField(null=True, blank=True)
     status = models.IntegerField(null=True, blank=True)
+    time = models.FloatField(null=True, blank=True)
 
     error = models.TextField(null=True, blank=True)
 

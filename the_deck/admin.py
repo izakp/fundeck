@@ -7,6 +7,10 @@ class HostAdmin(admin.ModelAdmin):
   # list_display = ["name"]
   search_fields = ["name"]
 
+@admin.register(ChefInventory)
+class ChefInventoryAdmin(admin.ModelAdmin):
+    search_fields = ["query"]
+
 @admin.register(Command)
 class CommandAdmin(admin.ModelAdmin):
   search_fields = ["name", "fqdn"]
@@ -18,6 +22,10 @@ class SshUserAdmin(admin.ModelAdmin):
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
   search_fields = ["command", "host", "username"]
+
+@admin.register(RemoteFile)
+class RemoteFileAdmin(admin.ModelAdmin):
+  search_fields = ["filename"]
 
 @admin.register(TaskRunner)
 class TaskRunnerAdmin(admin.ModelAdmin):

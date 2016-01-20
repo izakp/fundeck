@@ -1,2 +1,0 @@
-class LockAcquireError(Exception):
-    pass

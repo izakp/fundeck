@@ -4,9 +4,9 @@ Goals:
 
 	- To make something like rundeck that's easy to use, manage, deploy and backup
 
-	- Should be all pip-installable, modular and portable (via sqlite exports)
+	- Should be all pip-installable, modular and portable
 
-	- Should easily plug into ChefServer and PuppetDB APIs to generate dyanmic instance catalogues
+	- Should easily plug into ChefServer to generate dyanmic instance catalogues
 
 	- User signup via organization (google OAuth or invites)
 
@@ -32,7 +32,13 @@ Todo:
 
 A clone of Rundeck that emphasizes fun over agony
 
-Setup:
+### Setup
+
+Dependencies:
+- Redis
+- Postgres
+
+(Configure connections in settings.py)
 
 Fact!  Fundeck recommends using Virtual Environments: http://docs.python-guide.org/en/latest/dev/virtualenvs/
 

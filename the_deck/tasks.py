@@ -1,5 +1,9 @@
 from __future__ import absolute_import
 
+from datetime import datetime
+
+from paramiko import SSHException
+
 from celery import chord
 
 from fundeck.celery import app
@@ -11,57 +15,104 @@ from the_deck.lib.remote_command import RemoteCommand
 import logging
 logger = logging.getLogger(__name__)
 
-@app.task(name="task_runner_setup")
-def task_runner_setup(task_runner_id):
+@app.task(bind=True, max_retries=None, default_retry_delay=1)
+def task_runner_setup(self, task_runner_id):
     task_runner = TaskRunner.objects.get(id=task_runner_id)
+    if task_runner.state != TaskRunner.CREATED:
+        logger.error("Invalid state for TaskRunner %s" % task_runner_id)
+        return
+
+    if task_runner.task_group.running:
+        logger.warning("Task group id %s is already running.  Retrying in 1 second.")
+        raise self.retry()
+
+    task_runner.task_group.running = True
+    task_runner.task_group.save()
+
     task_runner.state = TaskRunner.PENDING
     task_runner.save()
 
-    return task_runner_start.apply_async(args=[task_runner_id])
+    task_runner_run.apply_async(args=[task_runner_id])
 
 
-@app.task(name="task_runner_start")
-def task_runner_start(task_runner_id):
+@app.task(bind=True)
+def task_runner_run(self, task_runner_id):
     task_runner = TaskRunner.objects.get(id=task_runner_id)
+    if task_runner.state != TaskRunner.PENDING:
+        logger.error("Invalid state for TaskRunner %s" % task_runner_id)
+        return
+
     tasks = [Task.objects.create(task_runner=task_runner,
                                 command=task_runner.task_group.command.command,
-                                host=host.fqdn,
-                                username=task_runner.task_group.ssh_user.username) for host in task_runner.task_group.hosts.all()]
+                                host=host,
+                                username=task_runner.task_group.ssh_user.username) for host in task_runner.task_group.collect_hosts()]
 
     task_runner.state = TaskRunner.RUNNING
     task_runner.save()
 
-    return chord([run_task.s(task.id) for task in tasks])(task_runner_on_complete.s(task_runner_id))
+    chord([run_task.si(task.id) for task in tasks])(task_runner_on_complete.si(task_runner_id))
 
+@app.task(bind=True)
+def run_task(self, task_id):
+    def fail_task(task):
+        e = traceback.format_exc()
+        logger.error(e)
+        task.error = e
+        task.state = Task.FAILED
+        task.save()
 
-@app.task(name="run_task")
-def run_task(task_id):
     task = Task.objects.get(id=task_id)
+    if task.state != Task.CREATED:
+        logger.error("Invalid state for Task %s" % task_id)
+        return
 
-    command_runner = RemoteCommand(task.command, 
-                                    task.host,
+    try:
+        command_runner = RemoteCommand(task.host,
                                     task.username,
                                     task.task_runner.task_group.ssh_user.private_key)
-    result = command_runner.run()
+    except Exception:
+        return fail_task(task)
 
-    logger.info(task_id)
-    logger.info((result.status, result.stderr, result.stdout))
+    task.state = Task.RUNNING
+    task.save()
 
-    if result.failed:
-        task.state = Task.FAILED
-        task.error = result.error
-    else:
+    remote_files = task.task_runner.task_group.command.remote_files.all()
+    for f in remote_files:
+        try:
+            command_runner.write_file(f.filename, f.content, f.permissions)
+        except SSHException:
+            return fail_task(task)
+
+    task_start = datetime.now()
+
+    try:
+        result = command_runner.run(task.command)
+    except SSHException:
+        return fail_task(task)
+
+    task_time = datetime.now() - task_start
+    task.time = task_time.total_seconds()
+
+    for f in remote_files:
+        try:
+            command_runner.delete_file(f.filename)
+        except SSHException, e:
+            return fail_task(task)
+
+    if result.succeeded:
         task.state = Task.SUCCEEDED
-        task.stderr = result.stderr
-        task.stdout = result.stdout
-        task.status = result.status
+    elif result.failed:
+        task.state = Task.FAILED
+
+    task.stderr = result.stderr
+    task.stdout = result.stdout
+    task.status = result.status
 
     task.save()
-    return task_id
 
 
-@app.task(name=("task_runner_on_complete"))
-def task_runner_on_complete(task_ids, task_runner_id):
+@app.task(bind=True)
+def task_runner_on_complete(self, task_runner_id):
     def success(tasks):
         for task in tasks:
             if task.state == Task.FAILED:
@@ -69,12 +120,16 @@ def task_runner_on_complete(task_ids, task_runner_id):
         return True
 
     task_runner = TaskRunner.objects.get(id=task_runner_id)
-    tasks = [Task.objects.get(id=tid) for tid in task_ids]
-    
-    if success(tasks):
+    if task_runner.state != TaskRunner.RUNNING:
+        logger.error("Invalid state for TaskRunner %s" % task_runner_id)
+        return
+
+    if success(task_runner.task_set.all()):
         task_runner.state = TaskRunner.SUCCEEDED
     else:
         task_runner.state = TaskRunner.FAILED
 
     task_runner.save()
-    return task_runner_id
+
+    task_runner.task_group.running = False
+    task_runner.task_group.save()

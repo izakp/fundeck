@@ -27,3 +27,4 @@ class TaskRunner(models.Model):
 
     def __str__(self):
         return "%s by %s at %s" % (self.task_group, self.user, self.updated_at)
+
