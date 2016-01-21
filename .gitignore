@@ -1,6 +1,7 @@
 *.pyc
 *.pyo
 *.sqlite3
+logfile
 
 *.png
 localsettings.py

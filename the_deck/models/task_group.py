@@ -17,7 +17,7 @@ class TaskGroup(models.Model):
     running = models.BooleanField(default=False)
 
     def __str__(self):
-        return 'Run "%s" on %s' % (self.command, [str(h.name) for h in self.hosts.all()])
+        return self.name
 
     def collect_hosts(self):
         all_hosts = []
