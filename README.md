@@ -53,7 +53,7 @@ Development:
 
 `python ./manage.py runserver`
 
-`celery -A fundeck worker -l debug`
+`celery -A fundeck worker -l debug --autoscale=100000,1 -Ofair`
 
 Production:
 

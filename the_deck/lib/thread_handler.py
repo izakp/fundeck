@@ -1,7 +1,6 @@
 import threading
 import sys
 
-
 class ThreadHandler(object):
     def __init__(self, name, callable, *args, **kwargs):
         # Set up exception handling

@@ -16,8 +16,6 @@ CELERY_RESULT_SERIALIZER = 'pickle'
 CELERY_ACKS_LATE = True
 CELERYD_PREFETCH_MULTIPLIER = 1
 
-CELERY_RESULT_BACKEND = 'redis://localhost/0'
-
 """
 Django settings for fundeck project.
 

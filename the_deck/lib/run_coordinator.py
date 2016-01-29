@@ -17,7 +17,7 @@ def run_guard(func):
         if self.failed:
             raise RunGuardException("Run coordinator failed")
         if self.any_task_failed:
-            self._fail()
+            self.fail()
         return func(*args, **kwargs)
     return wrapper
 
@@ -38,7 +38,7 @@ class RunCoordinator(object):
                 return True
         return False
 
-    def _fail(self):
+    def fail(self):
         self.task_runner.state = TaskRunner.FAILED
         self.task_runner.save()
         self._release_task_group_lock()
@@ -56,7 +56,7 @@ class RunCoordinator(object):
     @run_guard
     def acquire_task_group_lock(self):
         if self.task_runner.state != TaskRunner.CREATED:
-            self._fail()
+            self.fail()
 
         if self.task_runner.task_group.running:
             return False
@@ -70,9 +70,9 @@ class RunCoordinator(object):
         return True
 
     @run_guard
-    def prepare_tasks(self, run_task):
+    def prepare_tasks(self, autoscale_fn, run_task):
         if self.task_runner.state != TaskRunner.PENDING:
-            self._fail()
+            self.fail()
 
         self.task_runner.state = TaskRunner.RUNNING
         self.task_runner.save()
@@ -82,13 +82,14 @@ class RunCoordinator(object):
                                         command=self.task_runner.task_group.command.command,
                                         host=host,
                                         username=self.task_runner.task_group.ssh_user.username) for host in hosts]
+        autoscale_fn(len(tasks))
         for task in tasks:
             run_task.apply_async(args=[task.id])
 
     @run_guard
     def ensure_tasks_establish_connections(self):
         if self.task_runner.state != TaskRunner.RUNNING:
-            self._fail()
+            self.fail()
 
         while not self._all_tasks_have_established_connections():
             time.sleep(self.WAIT)
@@ -105,7 +106,7 @@ class RunCoordinator(object):
     @run_guard
     def ensure_tasks_prepare_assets(self):
         if self.task_runner.state != TaskRunner.CONNECTIONS_ESTABLISHED:
-            self._fail()
+            self.fail()
 
         while not self._all_tasks_have_prepared_assets():
             time.sleep(self.WAIT)
@@ -122,7 +123,7 @@ class RunCoordinator(object):
     @run_guard
     def ensure_commands_run(self):
         if self.task_runner.state != TaskRunner.ASSETS_PREPARED:
-            self._fail()
+            self.fail()
 
         while not self._all_tasks_have_run_commands():
             time.sleep(self.WAIT)
@@ -139,7 +140,7 @@ class RunCoordinator(object):
     @run_guard
     def ensure_tasks_complete(self):
         if self.task_runner.state != TaskRunner.COMMANDS_RUN:
-            self._fail()
+            self.fail()
 
         while not self._all_tasks_have_completed():
             time.sleep(self.WAIT)
@@ -156,5 +157,5 @@ class RunCoordinator(object):
     @run_guard
     def finalize_run(self):
         if self.task_runner.state != TaskRunner.COMPLETE:
-            self._fail()
+            self.fail()
         self._succeed()
