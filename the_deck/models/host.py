@@ -5,7 +5,7 @@ class Host(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     name = models.CharField(max_length=128)
-    fqdn = models.CharField(max_length=512)
+    fqdn = models.CharField(max_length=512, unique=True)
 
     def __str__(self):
         return self.name

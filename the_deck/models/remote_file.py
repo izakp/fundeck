@@ -6,7 +6,7 @@ class RemoteFile(models.Model):
 
     filename = models.CharField(max_length=128)
     content = models.TextField()
-    permissions = models.CharField(max_length=3, default="644")
+    permissions = models.CharField(max_length=4, default="644")
 
     def __str__(self):
         return self.filename

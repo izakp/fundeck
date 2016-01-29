@@ -7,7 +7,7 @@ class Command(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     name = models.CharField(max_length=128)
-    command = models.TextField()
+    command = models.CharField(max_length=2048)
     remote_files = models.ManyToManyField(RemoteFile, blank=True)
 
     def __str__(self):

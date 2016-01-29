@@ -78,7 +78,13 @@ class RemoteCommand(object):
         f = sftp_client.open(filename, 'w')
         f.write(content)
         f.close()
-        sftp_client.chmod(filename, int(permissions))
+
+        if len(permissions) == 3:
+            octal_permissions = int("0" + permissions, 8)
+        else:
+            octal_permissions = int(permissions, 8)
+
+        sftp_client.chmod(filename, octal_permissions)
         sftp_client.close()
 
     def delete_file(self, filename):
