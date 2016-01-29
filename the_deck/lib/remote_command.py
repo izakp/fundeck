@@ -1,7 +1,6 @@
 import select
 import sys
 import time
-import traceback
 
 from cStringIO import StringIO
 

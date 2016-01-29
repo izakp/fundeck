@@ -13,9 +13,10 @@ BROKER_URL = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['pickle']
 CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
+CELERY_ACKS_LATE = True
+CELERYD_PREFETCH_MULTIPLIER = 1
 
 CELERY_RESULT_BACKEND = 'redis://localhost/0'
-# CELERY_CHORD_PROPAGATES = False
 
 """
 Django settings for fundeck project.
