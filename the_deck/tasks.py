@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 TASK_TIME_LIMIT = 600
 
-@app.task(bind=True, max_retries=None, default_retry_delay=1, TASK_TIME_LIMIT)
+@app.task(bind=True, max_retries=None, default_retry_delay=1, soft_time_limit=TASK_TIME_LIMIT)
 def task_run(self, task_runner_id):
     app.control.pool_grow(1)
     try:
