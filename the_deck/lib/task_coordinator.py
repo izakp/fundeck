@@ -65,7 +65,7 @@ class TaskCoordinator(object):
         self.task.state = Task.PREPARING_ASSETS
         self.task.save()
 
-    def prepare_assets(self): 
+    def prepare_assets(self):
         if self.task.state != Task.PREPARING_ASSETS:
             raise TaskGuardException("Invlaid task state %s" % self.task.state)
 
